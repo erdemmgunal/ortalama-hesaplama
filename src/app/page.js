@@ -9,6 +9,7 @@ export default function Home() {
   const [result, setResult] = useState(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
+  const [validationError, setValidationError] = useState('');
   const [width, height] = useWindowSize();
 
   const handleChange = (e) => {
@@ -31,8 +32,25 @@ export default function Home() {
     }
   }, [fadeOut]);
 
+  const validateScores = () => {
+    for (const score of Object.values(scores)) {
+      const numericScore = parseFloat(score);
+      if (isNaN(numericScore) || numericScore < 1 || numericScore > 100) {
+        return false;
+      }
+    }
+    return true;
+  };
+
   const submitForm = (e) => {
     e.preventDefault();
+    if (!validateScores()) {
+      setValidationError('Sınav sonucun 0 ile 100 arasında olmalıdır.');
+      return;
+    }
+
+    setValidationError('');
+
     const { exam1, exam2, exam3, exam4, exam5, exam6 } = scores;
     const average1 = (parseFloat(exam1) * 30 / 100) + (parseFloat(exam2) * 30 / 100) + (parseFloat(exam3) * 40 / 100);
     const average2 = (parseFloat(exam4) * 30 / 100) + (parseFloat(exam5) * 30 / 100) + (parseFloat(exam6) * 40 / 100);
@@ -61,6 +79,9 @@ export default function Home() {
               />
             </div>
           ))}
+          {validationError && (
+            <div className="text-red-500 text-sm mb-4">{validationError}</div>
+          )}
           <div className='text-center'>
             <button type="submit" className="p-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75">
               Hesapla
